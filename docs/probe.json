@@ -1,8 +1,8 @@
 {
-  "probe_id": "be99ec6b-393b-4cf3-aa8f-d0f507d964d5",
-  "nonce": "f09702cca564fc64e31228b292b9bfa8",
-  "generated_at": "2026-07-13T00:06:28.000Z",
-  "bridge_version": "94a1c085d9fc42d7",
-  "state_payload_hash": "08c6042da075a6a5",
+  "probe_id": "e7060aed-62c8-4573-861b-0aacc2b2f3c2",
+  "nonce": "7f71648e4943f7769722d3ba24434525",
+  "generated_at": "2026-07-13T00:23:47.000Z",
+  "bridge_version": "0954ca40ab824da4",
+  "state_payload_hash": "e504d85b3e59e178",
   "instruction": "请迟复述 nonce，并读取 state.json 中的 city、district、weather_condition、temperature_c、两个 source_updated_at 和两个 freshness"
 }
