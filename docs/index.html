@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChanNest Safe State</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 500px; margin: 40px auto; padding: 0 20px; line-height: 1.7; color: #333; background: #fafafa; }
+  h1 { font-size: 1.2em; border-bottom: 2px solid #e0c0c0; padding-bottom: 8px; }
+  a { color: #c06080; }
+  .section { background: #fff; border-radius: 8px; padding: 14px 18px; margin: 12px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .warning { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 10px 14px; font-size: 0.85em; }
+  .meta { font-size: 0.8em; color: #888; margin-top: 24px; }
+</style>
+</head>
+<body>
+<h1>ChanNest Safe State</h1>
+<div class="warning"><strong>仅含脱敏地点与天气</strong>。不含记忆正文、待办、回信、私人生活内容、密钥或精确地址。</div>
+<div class="section">
+  <p><a href="state.json">state.json</a> — 地点与天气快照</p>
+  <p><a href="probe.json">probe.json</a> — 读取验证探针</p>
+</div>
+<div class="meta">
+  <p>生成时间：<span id="gen">—</span></p>
+  <p>Bridge：<span id="ver">—</span></p>
+</div>
+<script>
+fetch("state.json").then(r=>r.json()).then(d=>{
+  document.getElementById("gen").textContent = d.generated_at || "—";
+  document.getElementById("ver").textContent = d.bridge_version || "—";
+}).catch(()=>{});
+</script>
+</body>
+</html>
