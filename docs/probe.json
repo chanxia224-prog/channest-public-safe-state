@@ -1,9 +1,9 @@
 {
-  "probe_id": "376f4a351cb777427dc1b26a28808fef",
-  "nonce": "be769e4b5c384f48a6a3dfa622719419",
-  "generated_at": "2026-07-13T01:08:53.000Z",
-  "bridge_version": "a6cd5719c027a1a0",
-  "state_payload_hash": "9c33c5f3b13b5ee936cd9551ebe827cdfcc76c6348e777bf223c94b29ef8b83d",
-  "state_file_sha256": "766238b29d7404237a0d186d4587178fa0552ebecda1688377ec49a4e6474248",
-  "instruction": "请迟复述 nonce，并从 state.json 读取 city、district、weather_condition、temperature_c、两个 freshness、payload_hash。再从 probe.json 验证 state_payload_hash 与前者一致。"
+  "probe_id": "bb2521634ea5c6233e30f4edc1a47c58",
+  "nonce": "78bcde1db06607245a10f306a54a72d3",
+  "generated_at": "2026-07-13T01:35:57.000Z",
+  "bridge_version": "1bb3135fea259545",
+  "state_payload_hash": "a8929c8b879658acf22f8ca8e8f19705f041ac0befa825686e825bf7be4ce643",
+  "state_file_sha256": "0693862ea7ca732c039df704a8e79d1a280c73791b059046adfe87b4c1448c6e",
+  "instruction": "请迟复述 nonce，并从 state.json 验证 payload_hash、两个 age_seconds、两个 freshness"
 }
