@@ -161,7 +161,7 @@ def build_documents(
     bridge_version: str | None = None,
     probe_id: str | None = None,
     nonce: str | None = None,
-) -> tuple[dict[str, object], dict[str, object], bytes, bytes]:
+) -> tuple[dict[str, object], dict[str, object], bytes, bytes] | None:
     read_at = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     state = data.get("state") if isinstance(data.get("state"), dict) else {}
     location = state.get("location") if isinstance(state.get("location"), dict) else {}
@@ -172,18 +172,57 @@ def build_documents(
     location_freshness = compute_freshness(location_source, now=read_at)
     weather_freshness = compute_freshness(weather_source, now=read_at)
 
-    weather_code = weather.get("weather_code", 0)
+    # Prefer the new nested structure; legacy flat fields are only a fallback.
+    city = location.get("city") or data.get("city") or ""
+    district = location.get("district") or data.get("district") or ""
+    weather_code = weather.get("weather_code")
+    if weather_code is None:
+        weather_code = data.get("weather_code")
     weather_condition = WMO_CODES.get(weather_code, f"Unknown ({weather_code})")
+    temperature_c = weather.get("temperature_c")
+    if temperature_c is None:
+        temperature_c = weather.get("temp") if weather.get("temp") is not None else data.get("temperature_c")
+    feels_like_c = weather.get("feels_like_c")
+    if feels_like_c is None:
+        feels_like_c = data.get("feels_like_c")
+    humidity = weather.get("humidity")
+    if humidity is None:
+        humidity = data.get("humidity")
+
+    missing = [
+        name
+        for name, value in {
+            "city": city,
+            "district": district,
+            "location_source_updated_at": location_source,
+            "weather_source_updated_at": weather_source,
+        }.items()
+        if not value
+    ]
+    missing.extend(
+        name
+        for name, value in {
+            "weather_code": weather_code,
+            "temperature_c": temperature_c,
+            "feels_like_c": feels_like_c,
+            "humidity": humidity,
+        }.items()
+        if value is None
+    )
+    if missing:
+        print(f"Aborting sync: missing required fields: {', '.join(missing)}")
+        return None
+
     generated_at = utc_iso(read_at)
     bridge_version = bridge_version or secrets.token_hex(8)
 
     safe_state: dict[str, object] = {
-        "city": location.get("city", ""),
-        "district": location.get("district", ""),
+        "city": city,
+        "district": district,
         "weather_condition": weather_condition,
-        "temperature_c": weather.get("temperature_c", weather.get("temp")),
-        "feels_like_c": weather.get("feels_like_c"),
-        "humidity": weather.get("humidity"),
+        "temperature_c": temperature_c,
+        "feels_like_c": feels_like_c,
+        "humidity": humidity,
         "location_source_updated_at": location_source,
         "weather_source_updated_at": weather_source,
         "location_freshness_status": location_freshness["status"],
@@ -252,7 +291,11 @@ def main() -> int:
         print("Fetch failed, keeping existing state.")
         return 1
 
-    state, probe, state_bytes, probe_bytes = build_documents(data)
+    built = build_documents(data)
+    if built is None:
+        print("Build aborted, keeping existing state.")
+        return 1
+    state, probe, state_bytes, probe_bytes = built
     atomic_write_pair(docs_dir, state_bytes, probe_bytes)
     print(f"source={source}")
     print(f"now_utc={state['now_utc']}")
