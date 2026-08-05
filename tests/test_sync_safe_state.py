@@ -32,6 +32,7 @@ def sample_data(location_at=None, weather_at=None):
             },
             "weather": {
                 "temperature_c": 28.3,
+                "feels_like_c": 31.0,
                 "humidity": 77,
                 "weather_code": 51,
                 "source_updated_at": weather_at or ago(minutes=3),
@@ -123,6 +124,85 @@ class HashContractTests(unittest.TestCase):
             disk_probe = json.loads((target / "probe.json").read_text(encoding="utf-8"))
             self.assertEqual(disk_state["payload_hash"], disk_probe["state_payload_hash"])
             self.assertFalse(list(target.glob(".*.json.*")))
+
+
+class LegacyFallbackTests(unittest.TestCase):
+    def test_legacy_flat_fields_fall_back(self):
+        flat = {
+            "city": "Chengdu",
+            "district": "Jinniu",
+            "temperature_c": 26.0,
+            "feels_like_c": 29.0,
+            "humidity": 60,
+            "weather_code": 2,
+            "location_source_updated_at": ago(minutes=2),
+            "weather_source_updated_at": ago(minutes=2),
+            "phone_last_upload_attempt_at": ago(minutes=1),
+            "phone_last_upload_success_at": ago(minutes=1),
+            "phone_last_error": None,
+        }
+        state, probe, state_bytes, _ = build_documents(flat, now=NOW, bridge_version="test")
+        self.assertEqual(state["city"], "Chengdu")
+        self.assertEqual(state["district"], "Jinniu")
+        self.assertEqual(state["temperature_c"], 26.0)
+        self.assertEqual(state["feels_like_c"], 29.0)
+        self.assertEqual(state["humidity"], 60)
+        self.assertEqual(state["weather_condition"], "Partly cloudy")
+        self.assertEqual(state["location_freshness_status"], "fresh")
+        self.assertEqual(state["weather_freshness_status"], "fresh")
+        self.assertEqual(probe["state_payload_hash"], state["payload_hash"])
+        self.assertEqual(probe["state_file_sha256"], hashlib.sha256(state_bytes).hexdigest())
+
+    def test_nested_structure_preferred_over_flat(self):
+        data = sample_data()
+        data["city"] = "OldCity"
+        data["temperature_c"] = 1.0
+        state, _, _, _ = build_documents(data, now=NOW, bridge_version="test")
+        self.assertEqual(state["city"], "Chengdu")
+        self.assertEqual(state["temperature_c"], 28.3)
+
+    def test_missing_required_fields_abort(self):
+        result = build_documents(
+            {"state": {"location": {}, "weather": {}}},
+            now=NOW,
+            bridge_version="test",
+        )
+        self.assertIsNone(result)
+        self.assertIsNone(build_documents({"temperature_c": 20.0}, now=NOW, bridge_version="test"))
+
+    def test_missing_temperature_c_aborts(self):
+        data = sample_data()
+        data["state"]["weather"].pop("temperature_c")
+        self.assertIsNone(build_documents(data, now=NOW, bridge_version="test"))
+
+    def test_missing_feels_like_c_aborts(self):
+        data = sample_data()
+        data["state"]["weather"].pop("feels_like_c")
+        self.assertIsNone(build_documents(data, now=NOW, bridge_version="test"))
+
+    def test_missing_humidity_aborts(self):
+        data = sample_data()
+        data["state"]["weather"].pop("humidity")
+        self.assertIsNone(build_documents(data, now=NOW, bridge_version="test"))
+
+    def test_nested_weather_code_none_falls_back_to_root(self):
+        data = sample_data()
+        data["state"]["weather"]["weather_code"] = None
+        data["weather_code"] = 95
+        state, _, _, _ = build_documents(data, now=NOW, bridge_version="test")
+        self.assertEqual(state["weather_condition"], "Thunderstorm")
+
+    def test_weather_code_zero_is_valid(self):
+        data = sample_data()
+        data["state"]["weather"]["weather_code"] = 0
+        data["weather_code"] = 99
+        state, _, _, _ = build_documents(data, now=NOW, bridge_version="test")
+        self.assertEqual(state["weather_condition"], "Clear")
+
+    def test_missing_weather_code_aborts(self):
+        data = sample_data()
+        data["state"]["weather"].pop("weather_code")
+        self.assertIsNone(build_documents(data, now=NOW, bridge_version="test"))
 
 
 if __name__ == "__main__":
