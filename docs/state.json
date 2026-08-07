@@ -9,15 +9,15 @@
   "weather_source_updated_at": "2026-08-06T11:40:42.614Z",
   "location_freshness_status": "stale",
   "weather_freshness_status": "stale",
-  "location_age_seconds": 13950,
-  "weather_age_seconds": 13949,
+  "location_age_seconds": 46160,
+  "weather_age_seconds": 46159,
   "freshness_threshold_seconds": 900,
-  "now_utc": "2026-08-06T15:33:12.023Z",
-  "last_attempt_at": "2026-08-06T15:32:07.781Z",
-  "last_successful_push_at": "2026-08-06T15:32:07.781Z",
+  "now_utc": "2026-08-07T00:30:02.084Z",
+  "last_attempt_at": "2026-08-07T00:15:08.749Z",
+  "last_successful_push_at": "2026-08-07T00:15:08.749Z",
   "last_http_code": 200,
   "last_error_code": null,
-  "generated_at": "2026-08-06T15:33:12.023Z",
-  "bridge_version": "1aa8aba39bab4cb6",
-  "payload_hash": "e3cfc497afff2ab894b9ba383a3c23fc70989ffad9c357043a8c5717ef34be5b"
+  "generated_at": "2026-08-07T00:30:02.084Z",
+  "bridge_version": "80260b190e35b9c2",
+  "payload_hash": "b239c92b865c506276dda08c7dd79fe9fe4d26c89f086752be7d6cf3cb1ff277"
 }
