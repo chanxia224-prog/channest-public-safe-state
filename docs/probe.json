@@ -1,10 +1,10 @@
 {
-  "probe_id": "900dd10197bba64b3a9aae76a060b281",
-  "nonce": "e080b1afd2bd770b32372937d32dab07",
-  "generated_at": "2026-11-27T21:55:24.501Z",
-  "bridge_version": "9defed814b770a04",
-  "state_payload_hash": "24ed23020f46a9b23ea9312618478f89162102737171b3109557cdd412c160eb",
-  "state_file_sha256": "617785cbff64043e9615312f6b6d416e60c539ce515f896ba6eccd76b93cefc6",
+  "probe_id": "3250fd3b3cf6998c20f8cc7635448055",
+  "nonce": "c18d045430e219832a695efb65d4cd42",
+  "generated_at": "2026-11-28T03:41:01.176Z",
+  "bridge_version": "28944ace831ce619",
+  "state_payload_hash": "3d0001c09234550a6448f515fced7aec06420a45b992d0c891598a562a66f22c",
+  "state_file_sha256": "02700286fd4affdefe80e6b984450c374b0fb1a4abf3d18066dc8cd89795e9c8",
   "freshness_threshold_seconds": 900,
   "instruction": "请迟复述 nonce，并从 state.json 验证 payload_hash、两个 age_seconds、两个 freshness"
 }
